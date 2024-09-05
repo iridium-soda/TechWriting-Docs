@@ -115,7 +115,71 @@ class WriteReport(Action):
 1. 编写调用工具的action，在注释中注明功能并且规定传入参数
 1. 将action注册到role中
 
-### 工具的基本实现和Docker调用接口
+### Role方法与Action方法
+
+
+
+## 工具的基本实现步骤
+
+本节以[iridium-soda/meta_toolbox: An extensible toolkit for managing and deploying large model agents through Docker, ensuring uniformity and scalability. (github.com)](https://github.com/iridium-soda/meta_toolbox)中的fbinfer工具为例，说明如何逐级编写和部署工具。
+
+Fbinfer是由META（Facebook）推出的一款轻量级代码静态扫描工具，具有即插即用等特点。例如对于下面的示例代码：
+
+```c
+// hello.c
+#include <stdlib.h>
+
+void test() {
+  int *s = NULL;
+  *s = 42;
+}
+```
+
+运行命令：
+
+```shell
+infer run -- gcc -c /code.c
+```
+
+
+
+有下面的扫描结果：
+
+```plaintext
+code.c:7: error: Null Dereference
+  `s` could be null (null value originating from line 6) and is dereferenced. 
+  5. void test() {
+  6.   int *s = NULL;
+  7.   *s = 42;
+       ^
+  8. }
+
+
+Found 1 issue
+             Issue Type(ISSUED_TYPE_ID): #
+  Null Dereference(NULLPTR_DEREFERENCE): 1
+```
+
+该工具的目标是让角色根据情况调用该工具并进行扫描，阅读扫描结果并作为context进行下一步行动。为简便起见，仅考虑`.c`和`.cpp`代码（使用`gcc`/`g++`编译）
+
+### 基于Docker的工具包装
+
+为了环境的隔离，我们在docker容器中创建并持久化工具的运行环境。 Fbinfer的[环境配置](https://github.com/facebook/infer)比较简单，我们编写了如下的Dockerfile。该容器已发布到dockerhub上（`iridium191/fbinfer:latest`）。为保险起见，推荐将工具的Dockerfile保留到代码目录中以方便本地构建。
+
+```dockerfile
+FROM ubuntu:24.04
+# 安装必要的软件包并清理缓存
+RUN apt update \
+    && apt install -y --no-install-recommends --reinstall curl wget xz-utils gcc g++ ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/facebook/infer/releases/download/v1.2.0/infer-linux-x86_64-v1.2.0.tar.xz /
+RUN  	tar -C /opt -xJ -f infer-linux-x86_64-v1.2.0.tar.xz && \
+	ln -s "/opt/infer-linux-x86_64-v1.2.0/bin/infer" /usr/local/bin/infer && \
+	rm infer-linux-x86_64-v1.2.0.tar.xz
+CMD ["sleep","infinity"]
+```
+
+
 
 ### 基于Action方法的工具实现
 
