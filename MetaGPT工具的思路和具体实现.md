@@ -117,7 +117,7 @@ class WriteReport(Action):
 
 ### Role方法与Action方法
 
-MetaGPT官方给出的工具实现方法
+MetaGPT官方给出的工具实现方法是使用Data Interpreter类，通过大模型生成调用代码对工具提供
 
 ## 工具的基本实现步骤
 
