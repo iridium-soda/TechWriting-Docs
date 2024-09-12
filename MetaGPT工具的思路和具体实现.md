@@ -112,16 +112,29 @@ class WriteReport(Action):
 
 1. 在容器中创建工具的执行环境，明确指令格式和参数
 1. 编写接口代码，对容器做一个包装，作为单独的文件程序保证环境稳定性
-1. 编写调用工具的action，在注释中注明功能并且规定传入参数
-1. 将action注册到role中
+1. 在框架中进行注册
+
+由于调用工具的主体不同，可以分为基于Role的方法和基于Action的方法。第三步注册在这两种方法中具有一定差别。
 
 ### Role方法与Action方法
 
-MetaGPT官方给出的工具实现方法是使用Data Interpreter类，通过大模型生成调用代码对工具提供
+> [!tip]
+>
+> MetaGPT官方给出的方法即为Role方法，参见https://docs.deepwisdom.ai/main/zh/guide/tutorials/create_and_use_tools.html
+
+### 基于Role的方法
+
+MetaGPT官方给出的工具实现方法是使用Data Interpreter类（继承自`Role`类），通过大模型生成调用代码对工具提供的调用接口进行调用。在该方法中，工具在工具集中注册。
+
+### 基于Action的方法
+
+在实际的运行过程中发现，该类只能进行编写代码，运行并输出这一种行为，在其中无法整合更多的行为，达到单个Agent执行多种任务的目的（例如执行扫描+根据工具输出编写检查报告）。
+
+针对上面的问题，基于原生`Role`类提出一种新的调用工具的方法，即基于Action的方法。
 
 ## 工具的基本实现步骤
 
-本节以[iridium-soda/meta_toolbox: An extensible toolkit for managing and deploying large model agents through Docker, ensuring uniformity and scalability. (github.com)](https://github.com/iridium-soda/meta_toolbox)中的fbinfer工具为例，说明如何逐级编写和部署工具。
+本节以[iridium-soda/meta_toolbox: An extensible toolkit for managing and deploying large model agents through Docker, ensuring uniformity and scalability. (github.com)](https://github.com/iridium-soda/meta_toolbox)中的fbinfer工具为例，说明如何逐级编写和部署基于action的工具。
 
 Fbinfer是由META（Facebook）推出的一款轻量级代码静态扫描工具，具有即插即用等特点。例如对于下面的示例代码：
 
