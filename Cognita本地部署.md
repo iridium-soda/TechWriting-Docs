@@ -139,3 +139,8 @@ curl -X 'GET' '127.0.0.1:8000/health-check' -H 'accept: application/json'
 # {"status":"OK"}
 ```
 
+> [!tip]
+>
+> 注意API文档可以在这里看到：https://cognita.truefoundry.com/api/
+>
+> 在API文档中的endpoint为`https://cognita.truefoundry.com/api/`，因此在本地使用中用`127.0.0.1`代替
