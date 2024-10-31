@@ -1,5 +1,7 @@
 # Deploy cognita locally
 
+> [!tip]
+> 关于Cognita必须使用`TFY_KEY`的问题已经在该issue中解决：https://github.com/truefoundry/cognita/issues/382
 ## Description
 
 [Cognita](https://github.com/truefoundry/cognita)是一个API驱动的RAG开源项目，包含用户友好的前端页面和API驱动的后端，用于LLM的能力增强，并且准备了生产就绪环境。本文目标为在本地部署cognita，并配合拥有的多个大模型来源使用。
